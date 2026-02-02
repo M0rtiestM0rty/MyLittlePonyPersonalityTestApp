@@ -1,98 +1,152 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+const ponies = 
+[
+  "Princess Twilight Sparkle",
+  "Rarity",
+  "Applejack",
+  "Pinkie Pie",
+  "Fluttershy",
+  "Rainbow Dash",
+  "Spike",
+  "Nightmare Moon",
+  "Queen Chrysalis",
+  "King Sombra"
+];
 
-export default function HomeScreen() {
+const questions = 
+[
+  "I enjoy studying and learning new things.",
+  "I alphabetize things just for fun.",
+  "I’d rather read a book than go to a party.",
+  "I pay close attention to fashion and style.",
+  "I would never wear mismatched socks—even at home.",
+  "I’ve judged someone’s outfit in my head before.",
+  "I value honesty and hard work.",
+  "I think apples are the best fruit, hands down.",
+  "I prefer a home-cooked meal over fancy dining.",
+  "I love throwing parties and making others laugh.",
+  "I’ve eaten dessert before dinner—and I’d do it again.",
+  "I talk to inanimate objects when I’m bored.",
+  "I prefer quiet moments and caring for others.",
+  "I’ve cried over a cute animal video.",
+  "I whisper to plants to help them grow.",
+  "I thrive on competition and adventure.",
+  "I’ve pretended to be in an action movie while doing something boring.",
+  "I get competitive playing board games.",
+  "I’m a reliable friend who helps out whenever needed.",
+  "I’ve cleaned up someone else’s mess just to keep the peace.",
+  "I secretly love when someone asks me for help.",
+  "I sometimes feel driven by envy or ambition.",
+  "I’ve imagined making a grand comeback just to prove a point.",
+  "I get upset when people forget about me.",
+  "I can be strategic and persuasive to get my way.",
+  "I’ve pretended to like something just to fit in.",
+  "I can mimic someone else’s voice or tone pretty well.",
+  "I seek power and control in challenging situations.",
+  "I like when people follow my lead.",
+  "I enjoy the idea of being feared just a little."
+];
+
+const pointsMatrix = 
+[
+  [2,0,0,0,0,0,0,0,0,0],[2,0,0,0,0,0,0,0,0,0],[2,0,0,0,0,0,0,0,0,0],
+  [0,2,0,0,0,0,0,0,0,0],[0,2,0,0,0,0,0,0,0,0],[0,2,0,0,0,0,0,0,0,0],
+  [0,0,2,0,0,0,0,0,0,0],[0,0,2,0,0,0,0,0,0,0],[0,0,2,0,0,0,0,0,0,0],
+  [0,0,0,2,0,0,0,0,0,0],[0,0,0,2,0,0,0,0,0,0],[0,0,0,2,0,0,0,0,0,0],
+  [0,0,0,0,2,0,0,0,0,0],[0,0,0,0,2,0,0,0,0,0],[0,0,0,0,2,0,0,0,0,0],
+  [0,0,0,0,0,2,0,0,0,0],[0,0,0,0,0,2,0,0,0,0],[0,0,0,0,0,2,0,0,0,0],
+  [0,0,0,0,0,0,2,0,0,0],[0,0,0,0,0,0,2,0,0,0],[0,0,0,0,0,0,2,0,0,0],
+  [0,0,0,0,0,0,0,2,0,0],[0,0,0,0,0,0,0,2,0,0],[0,0,0,0,0,0,0,2,0,0],
+  [0,0,0,0,0,0,0,0,2,0],[0,0,0,0,0,0,0,0,2,0],[0,0,0,0,0,0,0,0,2,0],
+  [0,0,0,0,0,0,0,0,0,2],[0,0,0,0,0,0,0,0,0,2],[0,0,0,0,0,0,0,0,0,2]
+];
+
+export default function QuizScreen() 
+{
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [answers, setAnswers] = useState<number[]>(Array(questions.length).fill(0));
+  const [result, setResult] = useState<string | null>(null);
+
+  function handleAnswer(value: number) 
+  {
+    const updated = [...answers];
+    updated[currentQuestion] = value;
+    setAnswers(updated);
+
+    if (currentQuestion + 1 < questions.length) 
+    {
+      setCurrentQuestion(currentQuestion + 1);
+    } 
+    else 
+    {
+      setResult(calculatePony(updated));
+    }
+  }// end handleAnswer
+
+  function calculatePony(ans: number[]) 
+  {
+    const scores = Array(ponies.length).fill(0);
+
+    // Imperial rule
+    for (let p = 0; p < ponies.length; p++) 
+    {
+      const start = p * 3;
+      if (ans[start] && ans[start+1] && ans[start+2]) 
+      {
+        return ponies[p];
+      }
+    }// end imperial rule 
+
+    // Normal scoring
+    for (let i = 0; i < ans.length; i++) 
+    {
+      if (ans[i] === 1)
+      {
+        for (let j = 0; j < ponies.length; j++) 
+        {
+          scores[j] += pointsMatrix[i][j];
+        }
+      }
+    }// end normal scoring 
+
+    return ponies[scores.indexOf(Math.max(...scores))];
+  }// end calculatePony 
+
+  if (result) 
+  {
+    return(
+      <View style={styles.container}>
+        <Text style={styles.result}>Your Pony Match:</Text>
+        <Text style={styles.pony}>{result}</Text>
+      </View>
+    );
+  }// end result 
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <View style={styles.container}>
+      <Text style={styles.question}>
+        {currentQuestion + 1}. {questions[currentQuestion]}
+      </Text>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      <Pressable style={styles.button} onPress={() => handleAnswer(1)}>
+        <Text style={styles.buttonText}>True</Text>
+      </Pressable>
+
+      <Pressable style={styles.button} onPress={() => handleAnswer(0)}>
+        <Text style={styles.buttonText}>False</Text>
+      </Pressable>
+    </View>
   );
-}
+} // end QuizScreen
 
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
+const styles = StyleSheet.create
+({
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
+  question: { fontSize: 20, textAlign: 'center', marginBottom: 20 },
+  button: { backgroundColor: '#FFB6C1', padding: 15, borderRadius: 10, marginVertical: 5 },
+  buttonText: { color: 'white', fontSize: 18 },
+  result: { fontSize: 22, fontWeight: 'bold' },
+  pony: { fontSize: 26, color: '#4B0082' }
+}); // end style sheet 
