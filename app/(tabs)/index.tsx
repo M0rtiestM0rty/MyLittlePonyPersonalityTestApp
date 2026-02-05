@@ -1,17 +1,17 @@
-import { useRouter } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useRouter } from "expo-router";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
-export default function HomeScreen() 
-{
+export default function HomeScreen() {
   const router = useRouter();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🐴 My Little Pony Personality Test</Text>
+      <Text style={styles.title}>🦄 My Little Pony</Text>
+      <Text style={styles.subtitle}>Personality Quiz</Text>
 
       <Pressable
         style={styles.button}
-        onPress={() => router.push('/quiz')}
+        onPress={() => router.push("/(tabs)/quiz")}
       >
         <Text style={styles.buttonText}>Start Quiz</Text>
       </Pressable>
@@ -19,10 +19,34 @@ export default function HomeScreen()
   );
 }
 
-const styles = StyleSheet.create(
-{
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  title: { fontSize: 26, marginBottom: 30 },
-  button: { backgroundColor: '#FFB6C1', padding: 15, borderRadius: 10 },
-  buttonText: { color: 'white', fontSize: 18 }
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FCE4EC",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: "bold",
+    color: "#6A1B9A",
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 18,
+    color: "#4B0082",
+    marginBottom: 40,
+  },
+  button: {
+    backgroundColor: "#FFB6C1",
+    paddingVertical: 16,
+    paddingHorizontal: 40,
+    borderRadius: 20,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "600",
+  },
 });
