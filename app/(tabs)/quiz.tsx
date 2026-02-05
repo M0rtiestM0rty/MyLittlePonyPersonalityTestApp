@@ -1,6 +1,8 @@
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+
+/* ------------------ DATA ------------------ */
 
 const ponies = [
   "Princess Twilight Sparkle",
@@ -61,29 +63,30 @@ const pointsMatrix = [
   [0,0,0,0,0,0,0,0,0,2],[0,0,0,0,0,0,0,0,0,2],[0,0,0,0,0,0,0,0,0,2],
 ];
 
+/* ------------------ LOGIC ------------------ */
+
+function calculatePony(answers: number[]) {
+  const scores = Array(ponies.length).fill(0);
+
+  for (let i = 0; i < answers.length; i++) {
+    if (answers[i] === 1) {
+      for (let j = 0; j < ponies.length; j++) {
+        scores[j] += pointsMatrix[i][j];
+      }
+    }
+  }
+
+  return ponies[scores.indexOf(Math.max(...scores))];
+}
+
 /* ------------------ SCREEN ------------------ */
 
 export default function QuizScreen() {
   const router = useRouter();
-
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<number[]>(
     Array(questions.length).fill(0)
   );
-
-  function calculatePony(ans: number[]) {
-    const scores = Array(ponies.length).fill(0);
-
-    for (let i = 0; i < ans.length; i++) {
-      if (ans[i] === 1) {
-        for (let j = 0; j < ponies.length; j++) {
-          scores[j] += pointsMatrix[i][j];
-        }
-      }
-    }
-
-    return ponies[scores.indexOf(Math.max(...scores))];
-  }
 
   function handleAnswer(value: number) {
     const updated = [...answers];
@@ -94,27 +97,38 @@ export default function QuizScreen() {
       setCurrentQuestion(currentQuestion + 1);
     } else {
       const pony = calculatePony(updated);
-
       router.push({
-        pathname: '/(tabs)/result',
+        pathname: "/(tabs)/result",
         params: { pony },
       });
     }
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.question}>
-        {currentQuestion + 1}. {questions[currentQuestion]}
-      </Text>
+    <View style={styles.background}>
+      <View style={styles.card}>
+        <Text style={styles.progress}>
+          Question {currentQuestion + 1} of {questions.length}
+        </Text>
 
-      <Pressable style={styles.button} onPress={() => handleAnswer(1)}>
-        <Text style={styles.buttonText}>True</Text>
-      </Pressable>
+        <Text style={styles.question}>
+          {questions[currentQuestion]}
+        </Text>
 
-      <Pressable style={styles.button} onPress={() => handleAnswer(0)}>
-        <Text style={styles.buttonText}>False</Text>
-      </Pressable>
+        <Pressable
+          style={[styles.button, styles.trueButton]}
+          onPress={() => handleAnswer(1)}
+        >
+          <Text style={styles.buttonText}>True</Text>
+        </Pressable>
+
+        <Pressable
+          style={[styles.button, styles.falseButton]}
+          onPress={() => handleAnswer(0)}
+        >
+          <Text style={styles.buttonText}>False</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -122,27 +136,50 @@ export default function QuizScreen() {
 /* ------------------ STYLES ------------------ */
 
 const styles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#FCE4EC",
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
+  },
+  card: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 30,
+    width: "100%",
+    maxWidth: 380,
+    alignItems: "center",
+    elevation: 6,
+  },
+  progress: {
+    fontSize: 14,
+    color: "#888",
+    marginBottom: 10,
   },
   question: {
     fontSize: 20,
-    textAlign: 'center',
-    marginBottom: 20,
+    fontWeight: "600",
+    color: "#4B0082",
+    textAlign: "center",
+    marginBottom: 30,
   },
   button: {
-    backgroundColor: '#FFB6C1',
-    padding: 15,
-    borderRadius: 10,
-    marginVertical: 5,
-    width: '80%',
+    width: "100%",
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginVertical: 6,
+    alignItems: "center",
+  },
+  trueButton: {
+    backgroundColor: "#81C784",
+  },
+  falseButton: {
+    backgroundColor: "#E57373",
   },
   buttonText: {
-    color: 'white',
-    fontSize: 18,
-    textAlign: 'center',
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
