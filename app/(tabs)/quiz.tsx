@@ -1,10 +1,8 @@
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
 
-
-const ponies = 
-[
+const ponies = [
   "Princess Twilight Sparkle",
   "Rarity",
   "Applejack",
@@ -14,11 +12,10 @@ const ponies =
   "Spike",
   "Nightmare Moon",
   "Queen Chrysalis",
-  "King Sombra"
+  "King Sombra",
 ];
 
-const questions = 
-[
+const questions = [
   "I enjoy studying and learning new things.",
   "I alphabetize things just for fun.",
   "I’d rather read a book than go to a party.",
@@ -48,11 +45,10 @@ const questions =
   "I can mimic someone else’s voice or tone pretty well.",
   "I seek power and control in challenging situations.",
   "I like when people follow my lead.",
-  "I enjoy the idea of being feared just a little."
+  "I enjoy the idea of being feared just a little.",
 ];
 
-const pointsMatrix = 
-[
+const pointsMatrix = [
   [2,0,0,0,0,0,0,0,0,0],[2,0,0,0,0,0,0,0,0,0],[2,0,0,0,0,0,0,0,0,0],
   [0,2,0,0,0,0,0,0,0,0],[0,2,0,0,0,0,0,0,0,0],[0,2,0,0,0,0,0,0,0,0],
   [0,0,2,0,0,0,0,0,0,0],[0,0,2,0,0,0,0,0,0,0],[0,0,2,0,0,0,0,0,0,0],
@@ -62,75 +58,50 @@ const pointsMatrix =
   [0,0,0,0,0,0,2,0,0,0],[0,0,0,0,0,0,2,0,0,0],[0,0,0,0,0,0,2,0,0,0],
   [0,0,0,0,0,0,0,2,0,0],[0,0,0,0,0,0,0,2,0,0],[0,0,0,0,0,0,0,2,0,0],
   [0,0,0,0,0,0,0,0,2,0],[0,0,0,0,0,0,0,0,2,0],[0,0,0,0,0,0,0,0,2,0],
-  [0,0,0,0,0,0,0,0,0,2],[0,0,0,0,0,0,0,0,0,2],[0,0,0,0,0,0,0,0,0,2]
+  [0,0,0,0,0,0,0,0,0,2],[0,0,0,0,0,0,0,0,0,2],[0,0,0,0,0,0,0,0,0,2],
 ];
 
-export default function QuizScreen() 
-{
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<number[]>(Array(questions.length).fill(0));
-  const router = useRouter();
-  //const [result, setResult] = useState<string | null>(null); 
-  //may not work out if i want the result to return 
+/* ------------------ SCREEN ------------------ */
 
-  function handleAnswer(value: number) 
-  {
+export default function QuizScreen() {
+  const router = useRouter();
+
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [answers, setAnswers] = useState<number[]>(
+    Array(questions.length).fill(0)
+  );
+
+  function calculatePony(ans: number[]) {
+    const scores = Array(ponies.length).fill(0);
+
+    for (let i = 0; i < ans.length; i++) {
+      if (ans[i] === 1) {
+        for (let j = 0; j < ponies.length; j++) {
+          scores[j] += pointsMatrix[i][j];
+        }
+      }
+    }
+
+    return ponies[scores.indexOf(Math.max(...scores))];
+  }
+
+  function handleAnswer(value: number) {
     const updated = [...answers];
     updated[currentQuestion] = value;
     setAnswers(updated);
 
-    if (currentQuestion + 1 < questions.length) 
-    {
+    if (currentQuestion + 1 < questions.length) {
       setCurrentQuestion(currentQuestion + 1);
-    } 
-    else 
-    {
+    } else {
+      const pony = calculatePony(updated);
+
       router.push({
-        pathname: '/result',
-        params: {
-        answers: JSON.stringify(updated),
-    },
-    }); // end handleAnswer
+        pathname: '/(tabs)/result',
+        params: { pony },
+      });
+    }
+  }
 
-  function calculatePony(ans: number[]) 
-  {
-    const scores = Array(ponies.length).fill(0);
-
-    // Imperial rule
-    for (let p = 0; p < ponies.length; p++) 
-    {
-      const start = p * 3;
-      if (ans[start] && ans[start+1] && ans[start+2]) 
-      {
-        return ponies[p];
-      }
-    }// end imperial rule 
-
-    // Normal scoring
-    for (let i = 0; i < ans.length; i++) 
-    {
-      if (ans[i] === 1)
-      {
-        for (let j = 0; j < ponies.length; j++) 
-        {
-          scores[j] += pointsMatrix[i][j];
-        }
-      }
-    }// end normal scoring 
-
-    return ponies[scores.indexOf(Math.max(...scores))];
-  }// end calculatePony 
-
-/*  if (result) 
-  {
-    return(
-      <View style={styles.container}>
-        <Text style={styles.result}>Your Pony Match:</Text>
-        <Text style={styles.pony}>{result}</Text>
-      </View>
-    );
-  }// end result 
-*/ // commenting out will revist or not lets see 
   return (
     <View style={styles.container}>
       <Text style={styles.question}>
@@ -146,14 +117,32 @@ export default function QuizScreen()
       </Pressable>
     </View>
   );
-} // end QuizScreen
+}
 
-const styles = StyleSheet.create
-({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
-  question: { fontSize: 20, textAlign: 'center', marginBottom: 20 },
-  button: { backgroundColor: '#FFB6C1', padding: 15, borderRadius: 10, marginVertical: 5 },
-  buttonText: { color: 'white', fontSize: 18 },
-  result: { fontSize: 22, fontWeight: 'bold' },
-  pony: { fontSize: 26, color: '#4B0082' }
+/* ------------------ STYLES ------------------ */
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  question: {
+    fontSize: 20,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  button: {
+    backgroundColor: '#FFB6C1',
+    padding: 15,
+    borderRadius: 10,
+    marginVertical: 5,
+    width: '80%',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+    textAlign: 'center',
+  },
 });
