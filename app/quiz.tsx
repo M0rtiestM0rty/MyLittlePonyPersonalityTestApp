@@ -1,3 +1,4 @@
+import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -93,7 +94,7 @@ function generateQuiz()
   });
 
   return selected.sort(() => Math.random() - 0.5);
-}
+}// end generateQuiz()
 
 /* ------------------ LOGIC ------------------ */
 
@@ -113,119 +114,165 @@ export default function QuizScreen()
     setScores({});
   }, [reset]);
   
-  function handleAnswer(answer: boolean) {
+  function handleAnswer(answer: boolean) 
+  {
     const current = questions[currentIndex];
 
-    if (answer) {
+    if (answer) 
+    {
       setScores((prev: any) => ({
         ...prev,
         [current.pony]: (prev[current.pony] || 0) + 1,
       }));
     }
 
-    if (currentIndex + 1 < questions.length) {
+    if (currentIndex + 1 < questions.length) 
+    {
       setCurrentIndex(currentIndex + 1);
     } else {
       finishQuiz();
     }
-  }
+  }// end handleAnswer
 
   function finishQuiz() 
   {
-  // Safety: if user answered all false
-  if (Object.keys(scores).length === 0) {
-    router.push({
-      pathname: "/(tabs)/result",
+  if (Object.keys(scores).length === 0) 
+    {
+    router.replace
+    ({
+      pathname: "/result",
       params: { pony: "Princess Twilight Sparkle" },
     });
     return;
-  }
+    }
 
   const winner = Object.keys(scores).reduce((a, b) =>
     scores[a] > scores[b] ? a : b
   );
 
-  router.replace({
-    pathname: "/(tabs)/result",
-    params: { reset: Date.now() },
+  router.replace
+  ({
+    pathname: "/result",
+    params: { pony: winner }, 
+    // this should fix my loop back issue, allegedgedly 
   });
-}// end finishQuiz
+ }// end finishQuiz()
 
-  return (
-    <View style={styles.background}>
-      <View style={styles.card}>
-        <Text style={styles.progress}>
-          Question {currentIndex + 1} of {questions.length}
-        </Text>
+return (
+  <LinearGradient
+    colors={["#FCE4EC", "#F8BBD0", "#F48FB1"]}
+    style={styles.background}
+  >
+    <View style={styles.card}>
+      
+      <Text style={styles.progress}>
+        Question {currentIndex + 1} of {questions.length}
+      </Text>
 
-        <Text style={styles.question}>
-          {questions[currentIndex].question}
-        </Text>
+      <Text style={styles.question}>
+        {questions[currentIndex]?.question}
+      </Text>
 
-        <Pressable
-          style={[styles.button, styles.trueButton]}
-          onPress={() => handleAnswer(true)}
-        >
-          <Text style={styles.buttonText}>True</Text>
-        </Pressable>
+      {/* TRUE BUTTON */}
+      <Pressable
+        style={({ pressed }) => [
+          styles.button,
+          styles.trueButton,
+          { transform: [{ scale: pressed ? 0.95 : 1 }] },
+        ]}
+        onPress={() => handleAnswer(true)}
+      >
+        <Text style={styles.buttonText}>True</Text>
+      </Pressable>
 
-        <Pressable
-          style={[styles.button, styles.falseButton]}
-          onPress={() => handleAnswer(false)}
-        >
-          <Text style={styles.buttonText}>False</Text>
-        </Pressable>
-      </View>
+      {/* FALSE BUTTON */}
+      <Pressable
+        style={({ pressed }) => [
+          styles.button,
+          styles.falseButton,
+          { transform: [{ scale: pressed ? 0.95 : 1 }] },
+        ]}
+        onPress={() => handleAnswer(false)}
+      >
+        <Text style={styles.buttonText}>False</Text>
+      </Pressable>
+
     </View>
-  );
-}
-
+  </LinearGradient>
+); 
+}// end QuizScreen
 
 /* ------------------ STYLES ------------------ */
 
-const styles = StyleSheet.create({
-  background: {
+const styles = StyleSheet.create
+({
+  background: 
+  {
     flex: 1,
-    backgroundColor: "#FCE4EC",
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
   },
-  card: {
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 30,
-    width: "100%",
-    maxWidth: 380,
-    alignItems: "center",
-    elevation: 6,
+
+  card: 
+  {
+  backgroundColor: "rgba(255,255,255,0.9)", // slightly glassy
+  borderRadius: 24,
+  paddingVertical: 40,
+  paddingHorizontal: 30,
+  width: "100%",
+  maxWidth: 360,
+  alignItems: "center",
+
+  shadowColor: "#000",
+  shadowOpacity: 0.1,
+  shadowRadius: 20,
+  shadowOffset: { width: 0, height: 10 },
+  elevation: 10,
   },
-  progress: {
+
+  progress: 
+  {
     fontSize: 14,
     color: "#888",
     marginBottom: 10,
   },
-  question: {
+
+  question: 
+  {
     fontSize: 20,
     fontWeight: "600",
     color: "#4B0082",
     textAlign: "center",
     marginBottom: 30,
   },
-  button: {
-    width: "100%",
+
+  button: 
+  {
+    backgroundColor: "#FF4081",
     paddingVertical: 14,
-    borderRadius: 12,
-    marginVertical: 6,
-    alignItems: "center",
+    paddingHorizontal: 28,
+    borderRadius: 14,
+    marginTop: 10,
+
+    shadowColor: "#FF4081",
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
   },
-  trueButton: {
-    backgroundColor: "#81C784",
+
+  trueButton: 
+  {
+    backgroundColor: "#64e06aff",
   },
-  falseButton: {
-    backgroundColor: "#E57373",
+
+  falseButton: 
+  {
+    backgroundColor: "#c23b3bff",
   },
-  buttonText: {
+
+  buttonText: 
+  {
     color: "white",
     fontSize: 16,
     fontWeight: "600",
