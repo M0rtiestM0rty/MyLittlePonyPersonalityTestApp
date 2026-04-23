@@ -1,27 +1,89 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
-export default function ResultScreen() {
+const ponyData: any = {
+  "Princess Twilight Sparkle": {
+    image: require("../../assets/images/twilight.png"),
+    description: "You are intelligent, organized, and love learning.",
+  },
+  "Rainbow Dash": {
+    image: require("../../assets/images/rainbow.png"),
+    description: "You are bold, competitive, and fearless.",
+  },
+  "Pinkie Pie": {
+    image: require("../../assets/images/pinkie.png"),
+    description: "You are fun, energetic, and love making others smile.",
+  },
+  "Applejack": {
+    image: require("../../assets/images/applejack.png"),
+    description: "You are honest, hardworking, and dependable.",
+  },
+  "Rarity": {
+    image: require("../../assets/images/rarity.png"),
+    description: "You are creative, stylish, and detail-oriented.",
+  },
+  "Fluttershy": {
+    image: require("../../assets/images/fluttershy.png"),
+    description: "You are kind, gentle, and compassionate.",
+  },
+  "Spike": {
+    image: require("../../assets/images/spike.png"),
+    description: "You are loyal and supportive.",
+  },
+  "Nightmare Moon": {
+    image: require("../../assets/images/nightmaremoon.png"),
+    description: "You are powerful and independent.",
+  },
+  "Queen Chrysalis": {
+    image: require("../../assets/images/chrysalis.png"),
+    description: "You are strategic and cunning.",
+  },
+  "King Sombra": {
+    image: require("../../assets/images/sombra.png"),
+    description: "You are dominant and strong-willed.",
+  },
+};
+
+
+export default function ResultScreen() 
+{
   const { pony } = useLocalSearchParams<{ pony: string }>();
   const router = useRouter();
+  const data = ponyData[pony];
 
   return (
-    <View style={styles.background}>
-      <View style={styles.card}>
-        <Text style={styles.title}>✨ Your Pony Match ✨</Text>
+  <View style={styles.background}>
+    <View style={styles.card}>
+      <Text style={styles.title}>✨ Your Pony Match ✨</Text>
 
-        <Text style={styles.pony}>{pony}</Text>
+      <Text style={styles.pony}>{pony}</Text>
 
-        <Pressable
-          style={styles.button}
-          onPress={() => router.replace("/(tabs)/quiz")}
-        >
-          <Text style={styles.buttonText}>Take Quiz Again</Text>
-        </Pressable>
-      </View>
+      {data && 
+      (
+        <Image
+          source={data.image}
+          style=
+          {{
+            width: 150,
+            height: 150,
+            marginBottom: 20,
+            resizeMode: "contain",
+          }}
+        />
+      )}
+
+      <Pressable
+        style={styles.button}
+        onPress={() => router.replace("/(tabs)/quiz")}
+      >
+        <Text style={styles.buttonText}>Take Quiz Again</Text>
+      </Pressable>
     </View>
-  );
-}
+  </View>
+);
+
+}// end result screen 
+
 const styles = StyleSheet.create({
   background: {
     flex: 1,

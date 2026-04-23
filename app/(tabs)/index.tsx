@@ -9,11 +9,8 @@ export default function HomeScreen() {
       <Text style={styles.title}>🦄 My Little Pony</Text>
       <Text style={styles.subtitle}>Personality Quiz</Text>
 
-      <Pressable
-        style={styles.button}
-        onPress={() => router.push("/(tabs)/quiz")}
-      >
-        <Text style={styles.buttonText}>Start Quiz</Text>
+      <Pressable onPress={() => router.push("/(tabs)/quiz")}>
+        <Text>Start Quiz</Text>
       </Pressable>
     </View>
   );
